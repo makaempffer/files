@@ -34,15 +34,16 @@ void runClient(Client *client) {
 }
 
 void closeClient(Client *client) {
+  printf("[DEBUG] Closing client socket.\n");
   close(client->clientSocket);
 }
 
 void sendMessage(Client *client, const char *message) {
-  ssize_t bytesSent = send(client->clientSocket, message, strlen(message), 0);
+  ssize_t bytesSent = send(client->clientSocket, message, strlen(message) + 1, 0);
   if (bytesSent == -1) {
     perror("[ERROR] Error sending message");
   } else {
-    printf("[DEBUG] Sent message to the server: MSG %s\n", message);
+    printf("[DEBUG] Sent message: %s-Bytes: %zd\n", message, bytesSent);
   }
 }
 /*

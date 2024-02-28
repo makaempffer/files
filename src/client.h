@@ -1,7 +1,7 @@
 #ifndef CLIENT_H
 #define CLIENT_H
-
 #include <netinet/in.h>
+
 typedef struct {
   int clientSocket;
   struct sockaddr_in serverAddr;

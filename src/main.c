@@ -7,12 +7,20 @@
 #include "text_stack.h"
 #include <sys/socket.h>
 #include <pthread.h>
+#include <unistd.h>
+
 
 
 void* listenForConnectionsThread(void* serverPtr) {
   Server* server = (Server*)serverPtr;
-  listenForConnections(server);
-  receiveMessage(server);
+  while (1) {
+    if (server->currentConnections >= 1) {
+      receiveMessages(server); 
+    } else {
+      acceptConnections(server);
+    }
+    usleep(100*1000);
+  }
   return NULL;
 }
 
@@ -33,10 +41,12 @@ int main(void)
   ButtonData serverButton = {"SERVER", false, serverButtonRect, RED, false};
 
   Rectangle clientButtonRect = {160, 20, 120, 50};
-  ButtonData clientButton = {"CLIENT", false, clientButtonRect, BLUE, false};
+  ButtonData clientButton = {"CLIENT", false, clientButtonRect, RED, false};
 
+  Rectangle sendButtonRect = {300, 20, 120, 50};
+  ButtonData sendButton = {"SEND", false, sendButtonRect, GREEN, false};
 
-  pushTextStack(&textStack, "Hola valebb eejej");
+  pushTextStack(&textStack, "-TEXT-");
 
   while (!WindowShouldClose()) {
     BeginDrawing();
@@ -46,28 +56,37 @@ int main(void)
     // SERVER BUTTON LOGIC
     //
     checkButtonState(&serverButton);
+
     if (getButtonPressed(&serverButton) && !isInitialized) {
-      serverButton.color = GREEN;
+      serverButton.color = BLUE;
       isClient = false;
       isInitialized = true;
-      initializeServer(&server, 1);
+      initializeServer(&server, 3);
       setTextStack(&server, &textStack);
-
-      pthread_create(&connectionThread, NULL, listenForConnectionsThread, (void*)&server);
-
+      if (!isClient && isInitialized) pthread_create(&connectionThread, NULL, listenForConnectionsThread, (void*)&server);
     }
-    drawButton(serverButton);
+
     // CLIENT BUTTON LOGIC
     //
     checkButtonState(&clientButton);
     if (getButtonPressed(&clientButton) && !isInitialized) {
-      clientButton.color = GREEN;
+      clientButton.color = BLUE;
       isClient = true;
       isInitialized = true;
       initializeClient(&client);
+      runClient(&client);
     }
 
+    checkButtonState(&sendButton);
+    if (getButtonPressed(&sendButton) && isInitialized && isClient) {
+      sendMessage(&client, "Hello world!");
+    }
+
+
+    // Button draw
+    drawButton(sendButton);
     drawButton(clientButton);
+    drawButton(serverButton);
 
     EndDrawing();
   }
@@ -75,6 +94,7 @@ int main(void)
   if (isInitialized && !isClient) {
     pthread_join(connectionThread, NULL);
   }
+  closeClient(&client);
 
   CloseWindow();
   return 0;
