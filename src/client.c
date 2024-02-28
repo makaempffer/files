@@ -3,6 +3,8 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <sys/socket.h>
@@ -26,7 +28,8 @@ void runClient(Client *client) {
   if (connect(client->clientSocket, (struct sockaddr*)&client->serverAddr, sizeof(client->serverAddr)) == -1) {
     perror("[ERROR] Error connecting client to server");
   } else {
-    printf("[DEBUG] Connected to server succesfully");
+    printf("[DEBUG] Connected to server succesfully\n");
+    sendMessage(client, "bibi byebye");
   }
 }
 
@@ -34,6 +37,15 @@ void closeClient(Client *client) {
   close(client->clientSocket);
 }
 
+void sendMessage(Client *client, const char *message) {
+  ssize_t bytesSent = send(client->clientSocket, message, strlen(message), 0);
+  if (bytesSent == -1) {
+    perror("[ERROR] Error sending message");
+  } else {
+    printf("[DEBUG] Sent message to the server: MSG %s\n", message);
+  }
+}
+/*
 int main(void) {
   Client client;
   initializeClient(&client);
@@ -41,3 +53,4 @@ int main(void) {
   closeClient(&client);
   return 0;
 }
+*/

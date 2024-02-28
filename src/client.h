@@ -11,6 +11,7 @@ typedef struct {
 void initializeClient(Client *client);
 void runClient(Client *client);
 void closeClient(Client *client);
+void sendMessage(Client *client, const char *message);
 
 #endif // !CLIENT_H
 

@@ -1,8 +1,8 @@
 CC = gcc
 CFLAGS = -Wall -Iraylib/src -Lraylib/src -lraylib -lm
 
-SOURCES = src/main.c src/server.c
-HEADERS = src/constants.h src/server.h
+SOURCES = src/main.c src/server.c src/button_data.c src/functions.c src/text_stack.c src/client.c
+HEADERS = src/constants.h src/server.h src/button_data.h src/functions.h src/text_stack.h src/client.h
 EXECUTABLE = game
 
 all: $(EXECUTABLE)
