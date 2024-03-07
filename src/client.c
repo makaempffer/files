@@ -29,7 +29,7 @@ void runClient(Client *client) {
     perror("[ERROR] Error connecting client to server");
   } else {
     printf("[DEBUG] Connected to server succesfully\n");
-    sendMessage(client, "bibi byebye");
+    sendMessage(client, "Client connected succesfully.");
   }
 }
 
